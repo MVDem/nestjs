@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { INewsEdit } from './news.controller';
 
 export interface INews {
   id: number;
@@ -25,6 +26,22 @@ export class NewsService {
     const finalNews = { ...news, id: id };
     this.news.push(finalNews);
     return finalNews;
+  }
+
+  getAll(): INews[] {
+    return this.news;
+  }
+
+  edit(id: number, news: INewsEdit): INews | undefined {
+    const indexEditNews = this.news.findIndex((news: INews) => news.id === id);
+    if (indexEditNews !== -1) {
+      this.news[indexEditNews] = {
+        ...this.news[indexEditNews],
+        ...news,
+      };
+      return this.news[indexEditNews];
+    }
+    return undefined;
   }
 
   find(id: INews['id']): INews | undefined {
