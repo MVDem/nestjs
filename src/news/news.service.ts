@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { INewsEdit } from './news.controller';
+import { Comment } from './comments/comments.service';
 
 export interface INews {
   id: number;
@@ -6,7 +8,10 @@ export interface INews {
   description: string;
   autor: string;
   countView: number;
+  comments?: Comment[];
+  cover?: string;
 }
+
 @Injectable()
 export class NewsService {
   private readonly news: INews[] = [
@@ -16,6 +21,8 @@ export class NewsService {
       description: 'текст новости',
       autor: 'Максим',
       countView: 2,
+      cover:
+        'https://ichef.bbci.co.uk/news/640/cpsprodpb/14236/production/_104368428_gettyimages-543560762.jpg',
     },
   ];
 
@@ -25,6 +32,22 @@ export class NewsService {
     const finalNews = { ...news, id: id };
     this.news.push(finalNews);
     return finalNews;
+  }
+
+  getAll(): INews[] {
+    return this.news;
+  }
+
+  edit(id: number, news: INewsEdit): INews | undefined {
+    const indexEditNews = this.news.findIndex((news: INews) => news.id === id);
+    if (indexEditNews !== -1) {
+      this.news[indexEditNews] = {
+        ...this.news[indexEditNews],
+        ...news,
+      };
+      return this.news[indexEditNews];
+    }
+    return undefined;
   }
 
   find(id: INews['id']): INews | undefined {
