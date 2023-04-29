@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { CreateCommentDto } from './dtos/create-comment-dto';
 
 export type Comment = {
   id?: number;
@@ -16,7 +17,7 @@ export type CommentEdit = {
 export class CommentsService {
   private readonly comments = {};
 
-  create(idNews: number, comment: Comment) {
+  create(idNews: number, comment: CreateCommentDto) {
     if (!this.comments[idNews]) {
       this.comments[idNews] = [];
     }
@@ -36,12 +37,12 @@ export class CommentsService {
     }
     this.comments[idNews][indexComment] = {
       ...this.comments[idNews][indexComment],
-      comment,
+      ...comment,
     };
     return this.comments[idNews];
   }
 
-  find(idNews: number): Comment[] | undefined {
+  find(idNews: number): CreateCommentDto[] | undefined {
     return this.comments[idNews] || undefined;
   }
 
