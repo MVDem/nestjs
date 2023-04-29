@@ -3,7 +3,7 @@ import { INewsEdit } from './news.controller';
 import { Comment } from './comments/comments.service';
 
 export interface INews {
-  id: number;
+  id?: number;
   title: string;
   description: string;
   autor: string;
