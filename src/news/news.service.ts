@@ -21,8 +21,7 @@ export class NewsService {
       description: 'текст новости',
       autor: 'Максим',
       countView: 2,
-      cover:
-        'https://ichef.bbci.co.uk/news/640/cpsprodpb/14236/production/_104368428_gettyimages-543560762.jpg',
+      cover: '/696835ec-c268-4b4c-bfa5-9cc88893f156.jpg',
     },
   ];
 

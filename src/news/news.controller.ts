@@ -8,21 +8,18 @@ import {
   Param,
   Post,
   Put,
-  Request,
-  Res,
+  Render,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { INews, NewsService } from './news.service';
 import { CommentsService } from './comments/comments.service';
-import { renderNewsAll } from 'src/views/news/news-all';
-import { renderTemplate } from 'src/views/template';
-import { renderNewsDetaile } from 'src/views/news/news-detail';
 import { CreateNewsDto } from './dtos/create-news-dto';
 import { EditNewsDto } from './dtos/edit-news-dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { HelperFileLoader } from 'src/utils/helperFileLoader';
+import { MailService } from 'src/mail/mail.service';
 
 const PATH_NEWS = '/news-static/';
 HelperFileLoader.path = PATH_NEWS;
@@ -39,6 +36,7 @@ export class NewsController {
   constructor(
     private readonly newsServise: NewsService,
     private readonly commentsService: CommentsService,
+    private readonly mailService: MailService,
   ) {}
 
   @Get('/api/detail/:id')
@@ -57,26 +55,32 @@ export class NewsController {
   getAll(): INews[] {
     return this.newsServise.getAll();
   }
-  @Get('/all')
+
+  @Get('all')
+  @Render('news-list')
   getAllView() {
     const news = this.newsServise.getAll();
-    const content = renderNewsAll(news);
-    return renderTemplate(content, {
-      title: 'Список новостей',
-      description: 'Новости',
-    });
+    // const content = renderNewsAll(news);
+    // return renderTemplate(content, {
+    //   title: 'Список новостей',
+    //   description: 'Новости',
+    // });
+    return { news };
+  }
+
+  @Get('create/new')
+  @Render('create-news')
+  async createView() {
+    return {};
   }
 
   @Get('/detail/:id')
+  @Render('news-detail')
   getDetailView(@Param('id') id: string) {
     const idInt = parseInt(id);
     const news = this.newsServise.find(idInt);
     const comments = this.commentsService.find(idInt);
-    const content = renderNewsDetaile(news, comments);
-    return renderTemplate(content, {
-      title: news.title,
-      description: news.description,
-    });
+    return { news, comments };
   }
 
   @Post('/api')
@@ -88,10 +92,10 @@ export class NewsController {
       }),
     }),
   )
-  create(
+  async create(
     @Body() news: CreateNewsDto,
     @UploadedFile() cover: Express.Multer.File,
-  ): INews {
+  ): Promise<INews> {
     const fileExtantion = cover.originalname.split('.').reverse()[0];
     if (!fileExtantion || !fileExtantion.match(/(jpeg|png|jpg|gif)$/)) {
       throw new HttpException(
@@ -105,7 +109,12 @@ export class NewsController {
     if (cover?.filename) {
       news.cover = PATH_NEWS + cover.filename;
     }
-    return this.newsServise.create(news);
+    const createdNews = this.newsServise.create(news);
+    await this.mailService.sendNewNewsForAdmins(
+      ['9602598255@mail.ru'],
+      createdNews,
+    );
+    return createdNews;
   }
 
   @Put('/api/:id')
