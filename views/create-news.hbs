@@ -1,0 +1,38 @@
+<h1>Создание новости</h1>
+<Form method='post' action='/news/api' enctype='multipart/form-data'>
+  <div class='mb-3'>
+    <lable for='titleInput' class='form-lable'>Загловок</lable>
+    <input class='form-control' name='title' id='titleInput' />
+  </div>
+  <div class='mb-3'>
+    <lable for='descriptionInput' class='form-lable'>Описание</lable>
+    <textarea
+      class='form-control'
+      name='description'
+      id='descriptionInput'
+    ></textarea>
+  </div>
+  <div class='mb-3'>
+    <lable for='autorInput' class='form-lable'>Автор</lable>
+    <input class='form-control' name='autor' id='autorInput' />
+  </div>
+  <div class='form-group'>
+    <lable for='coverInput'>Обложка</lable>
+    <input type='file' class='form-control-file' name='cover' id='coverInput' />
+  </div>
+  <input type='submit' value='Создать' />
+  {{! <button
+    type='button'
+    class='btn btn-primary'
+    onclick='sendForm()'
+  >Создать</button> }}
+</Form>
+{{! <script
+  type='text/javascript'
+  src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'
+></script>
+<script>
+  function sendForm(){ let data = new FormData($('form')[0]); $.ajax({
+  url:'/news/api', data: data, cash: false, contentType: false, processData:
+  false, method: 'POST'}) }
+</script> }}
